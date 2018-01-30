@@ -3,3 +3,5 @@
 *.csv
 .idea/
 *.iml
+**/*target/
+**/*project/

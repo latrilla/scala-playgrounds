@@ -21,8 +21,8 @@ class RatingsTest extends FlatSpec with Matchers {
   "A ratings" should "correctly compute a rating penalty" in {
     val ratings: Ratings = new Ratings()
     val (uId1: Int, pId1: Int) = (1, 11)
-    val ts_2_days_before = System.currentTimeMillis() - 2 * Utils.MILLIS_TO_DAYS
     val ts_now = System.currentTimeMillis()
+    val ts_2_days_before = ts_now - 2l * Utils.MILLIS_TO_DAYS
     ratings.store(uId1, pId1, 2, ts_now)
     ratings.store(uId1, pId1, 4, ts_2_days_before)
 
@@ -41,5 +41,19 @@ class RatingsTest extends FlatSpec with Matchers {
 
     ratings.toDumpSeq should be(Stream(Seq("2", "11", "60.0"), Seq("1", "22", "2.0"), Seq("1", "11", "6.0")))
   }
+
+
+  "A ratings" should "not dump low ratings (<0.01)" in {
+    val ratings: Ratings = new Ratings()
+    val (uId1: Int, uId2: Int, pId1: Int, pId2: Int) = (1, 2, 11, 22)
+    val ts_now = System.currentTimeMillis()
+    val ts_before = ts_now - (100l * Utils.MILLIS_TO_DAYS)
+    ratings.store(uId1, pId1, 2, ts_now)
+    ratings.store(uId1, pId1, 4, ts_now)
+    ratings.store(uId1, pId2, 1, ts_before)
+
+    ratings.toDumpSeq should be(Stream(Seq("1", "11", "6.0")))
+  }
+
 
 }

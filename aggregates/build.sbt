@@ -20,12 +20,9 @@ releaseProcess := Seq[ReleaseStep](
   inquireVersions,
   runClean,
   releaseStepCommandAndRemaining("^ test"),
-  releaseStepCommandAndRemaining("^ scripted"),
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  //releaseStepCommandAndRemaining("^ publishSigned"),
-  //releaseStepTask(bintrayRelease in `sbt-release`),
   setNextVersion,
   commitNextVersion,
   pushChanges

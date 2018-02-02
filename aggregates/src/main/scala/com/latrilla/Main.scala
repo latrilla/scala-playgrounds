@@ -3,22 +3,23 @@ package com.latrilla
 import java.io._
 
 import com.latrilla.Utils._
-import com.latrilla.aggregates.UUIDToIntegerLookup
+import com.latrilla.aggregates.{IntLookup, Ratings}
 
 object Main extends App {
 
 
   override def main(args: Array[String]): Unit = {
-    val usersLookup: UUIDToIntegerLookup = new UUIDToIntegerLookup()
-    val productLookup: UUIDToIntegerLookup = new UUIDToIntegerLookup()
+    val userLookup: IntLookup[String] = new IntLookup()
+    val productLookup: IntLookup[String] = new IntLookup()
+    val ratings: Ratings = new Ratings()
+
 
     try {
       val bufferedReader = new BufferedReader(new FileReader(args(0)))
-      time(readAndStore(bufferedReader, usersLookup, productLookup), "readAndStore")
       memInfo()
-      time(usersLookup.dump("userlookup.csv", "userId"), "dump users")
+      time(readAndStore(bufferedReader, userLookup, productLookup, ratings), "readAndStore")
       memInfo()
-      time(productLookup.dump("productlookup.csv", "itemId"), "dump product")
+      time(dump(userLookup, productLookup, ratings), "dump all")
       memInfo()
     }
     catch {
@@ -28,14 +29,20 @@ object Main extends App {
     }
   }
 
-  def readAndStore(reader: BufferedReader, usersLookup: UUIDToIntegerLookup, productLookup: UUIDToIntegerLookup): Unit = {
+  def dump(userLookup: IntLookup[String], productLookup: IntLookup[String], ratings: Ratings): Unit = {
+    time(userLookup.dump("userlookup.csv"), "dump users")
+    time(productLookup.dump("productlookup.csv"), "dump product")
+    time(ratings.dump("aggratings.csv"), "dump aggregates")
+  }
+
+  def readAndStore(reader: BufferedReader, usersLookup: IntLookup[String], productLookup: IntLookup[String], ratings: Ratings): Unit = {
     var line: String = null
     while ( {
-      line = reader.readLine; line != null
+      line = reader.readLine
+      line != null
     }) {
       val Array(userId, itemId, rating, timestamp) = line.split(",").map(_.trim)
-      usersLookup.store(userId)
-      productLookup.store(itemId)
+      ratings.store(usersLookup.store(userId), productLookup.store(itemId), rating.toInt, timestamp.toLong)
     }
   }
 

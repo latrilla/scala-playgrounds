@@ -1,6 +1,7 @@
 package com.latrilla
 
 import java.sql.Timestamp
+;
 
 /*
 Imported from https://github.com/akhld/scala-csv-lookup/blob/master/src/main/scala-2.12/Utils.scala

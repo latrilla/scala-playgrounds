@@ -15,7 +15,7 @@ class RatingsTest extends FlatSpec with Matchers {
     ratings.store(uId2, pId1, 20, System.currentTimeMillis())
     ratings.store(uId2, pId1, 40, System.currentTimeMillis())
 
-    ratings.aggregate() should be(Map((uId1, pId1) -> 6, (uId1, pId2) -> 2, (uId2, pId1) -> 60))
+    ratings.aggregate should be(Map((uId1, pId1) -> 6, (uId1, pId2) -> 2, (uId2, pId1) -> 60))
   }
 
   "A ratings" should "correctly compute a rating penalty" in {
@@ -39,7 +39,7 @@ class RatingsTest extends FlatSpec with Matchers {
     ratings.store(uId2, pId1, 20, System.currentTimeMillis())
     ratings.store(uId2, pId1, 40, System.currentTimeMillis())
 
-    ratings.toDumpSeq should be(Stream(Seq("2", "11", "60.0"), Seq("1", "22", "2.0"), Seq("1", "11", "6.0")))
+    ratings.toWriteSeq should be(Stream(Seq("1", "11", "6.0"), Seq("1", "22", "2.0"), Seq("2", "11", "60.0")))
   }
 
 
@@ -52,7 +52,7 @@ class RatingsTest extends FlatSpec with Matchers {
     ratings.store(uId1, pId1, 4, ts_now)
     ratings.store(uId1, pId2, 1, ts_before)
 
-    ratings.toDumpSeq should be(Stream(Seq("1", "11", "6.0")))
+    ratings.toWriteSeq should be(Stream(Seq("1", "11", "6.0")))
   }
 
 
